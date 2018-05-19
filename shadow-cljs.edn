@@ -3,7 +3,7 @@
  ["src"]
 
  :dependencies
- []
+ [[reagent "0.8.1"]]
 
  :builds
  {:app {:target :browser

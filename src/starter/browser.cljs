@@ -1,8 +1,15 @@
-(ns starter.browser)
+(ns starter.browser
+  (:require [reagent.core :as r]))
+
+(defn app-component []
+  [:div
+   [:span "Hello World!"]])
 
 ;; start is called by init and after code reloading finishes
 (defn ^:dev/after-load start []
-  (js/console.log "start"))
+  (js/console.log "start")
+  (r/render [app-component]
+            (js/document.getElementById "app")))
 
 (defn ^:export init []
   ;; init is called ONCE when the page loads
