@@ -1,3 +1,14 @@
 body {
-  color: green;
+    font-family: Arial;
+}
+
+
+.app-container {
+    display: flex;
+    height: 100%;
+    flex-flow: column nowrap;
+}
+
+.lesson-container {
+    flex-grow: 2;
 }
