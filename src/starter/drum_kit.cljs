@@ -67,33 +67,22 @@
     (play audio)
     (pause audio)))
 
-
 ;; Components
-(defn key-code
-  "Returns pointer to currently pressed key"
-  []
-  (r/with-let [key-pointer (r/atom nil)
-               event "onkeypress"
-               handler (fn [k]
-                         (do
-                           (js/console.log "####tracked hit" k)
-                           (reset! key-pointer k)))
-               _ (.addEventListener js/document event handler)]
-    @key-pointer
-    (finally
-      (.removeEventListener js/document event handler))))
-
 (defn letter-button
   "Renders a button displaying the key
   and playing an audio clip if clicked"
   [{:keys [key clip]} key-code]
-  (let [audio (when clip (js/Audio. clip))
-        ;; _ @(r/track key-code)
-        ]
-    (fn []
-      [:div {:class 'letter
-             :on-click (when clip #(play-pause audio))}
-       (char->str key)])))
+  (r/with-let [audio (when clip (js/Audio. clip)) ;; Keep reference to object;
+               play-handler #(play-pause audio)
+               key-handler #(when (or (= (.-charCode %) key)
+                                  (= (.-charCode %) (+ 32 key))) ;;TODO: also check for audio existence
+                          (play-handler))
+               _ (.addEventListener js/document "keypress" key-handler)]
+  [:div {:class 'letter
+         :on-click (when clip play-handler)} ;;TODO: set style when playing
+   (char->str key)]
+  (finally
+    (.removeEventListener js/document "keypress" key-handler))))
 
 (defn letters []
   [:div {:class "letter-container"}
