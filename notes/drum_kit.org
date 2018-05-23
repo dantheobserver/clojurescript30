@@ -1,0 +1,22 @@
+* Drum Kit Notes
+* Reagent
+** Tracking
+*** Allows you to peek into a particular aspect of state and watch for changes
+    #+BEGIN_SRC clojurescript
+      (def state (r/atom {:playing #{}})) ;; Our state object
+      (defn playing [] (:playing @state)) ;; function that gets our playing state value
+      (defn playing? #(-> @(r/track playing) (get %))) ;; Will be called when @state changes
+
+      ;; component will re-render if only value returned has change
+      (defn component []
+        (let [playing? @(r/track playing?)]
+          [:div (str "playing?: playing")]))
+    #+END_SRC
+* Interop 
+** Audio object
+    #+BEGIN_SRC clojurescript
+      (def audio (js/Audio. url)) ;;create  audio obj
+      (set! (.-currentTime audio) 0.0) ;; set time
+      (.-currentTime audio) ;; get time
+      (.-paused clip) ;; check if paused
+    #+END_SRC
