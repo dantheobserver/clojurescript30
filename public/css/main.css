@@ -1,7 +1,10 @@
+html {
+    font-size: 62.5%
+}
 body {
     font-family: Arial;
+    font-size: 1.2em;
 }
-
 
 .app-container {
     display: flex;

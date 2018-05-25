@@ -2,6 +2,15 @@
   (:require [starter.utils :refer [styled-component]]
             [reagent.core :as r]))
 
+(defn random-color [] (-> (js/Math.random) (* 255) int))
+(defn random-rgb [] (vec (repeatedly 3 random-color)))
+
+(defn random-rgb-style
+  [a]
+  (let [rgba (into-array (conj (random-rgb) a))]
+    (str "rgba(" (.join rgba) ")")))
+
+(js/console.log "test: " (random-rgb-style 1))
 (def style
   [:#lesson
    {:width "100%" :height "900px";
@@ -19,39 +28,50 @@
      :width "100%"
      }]
    [:.letter
-    {:font-size "34px"
-     :font-weight "400"
-     :color "#f9d275"
+    {:display "flex"
+     :flex-flow "column nowrap"
+     :justify-content "center"
      :width "100px"
      :height "100px"
      :margin "10px 15px;"
      :background-color "rgba(0, 0, 0, .2)"
      :text-align "center"
-     :line-height "100px"
      :border "3px solid black"
      :box-shadow "inset black 0 0 10px"
      :border-radius "10px"
      :transition "0.4s all"
      }
-    [:&:hover :&.playing
+    [:.key
+     {:font-size "4rem"
+      :font-weight "400"
+      :color "#f9d275"}]
+    [:.name
+     {:font-size "1.5rem"
+      :color "orange"
+      }]
+    [:&:Hover :&.playing
      {:font-weight "800"
       :background-color "rgba(157, 197, 95, .4)"
       :transform "scale(1.1)"
-      :border "3px solid #f9d275"}]
+      :border "3px solid #f9d275"
+      :box-shadow (str "1rem 1rem 2rem " (random-rgb-style 1))
+      }]
     ]
    ])
 
 ;;This probably would be better of using strings as keys.
-(def mp3 #(str "/audio/" % ".mp3"))
-(def key-codes [{:key "A" :clip (mp3 "dnb_loop") :name "backdrop"}
-                {:key "B"}
-                {:key "C"}
-                {:key "D"}
-                {:key "E"}
-                {:key "F"}
-                {:key "G"}
-                {:key "H"}
-                {:key "I"}])
+(def audio-dir #(str "/audio/" %1 %2))
+(def mp3 #(audio-dir % ".mp3"))
+(def wav #(audio-dir % ".wav"))
+(def key-codes [{:key "a" :clip (wav "clap-analog") :name "analog clap" }
+                {:key "s" :clip (wav "cowbell-808") :name "cowbell" }
+                {:key "d" :clip (wav "hihat-acoustic02") :name "hi acoustic" }
+                {:key "f" :clip (wav "hihat-digital") :name "hi digital" }
+                {:key "g" :clip (wav "hihat-ring") :name "hi ring" }
+                {:key "h" :clip (wav "kick-big") :name "kick big" }
+                {:key "j" :clip (wav "perc-chirpy") :name "perc chirpy" }
+                {:key "k" :clip (wav "perc-nasty") :name "perc nasty" }
+                {:key "l" :clip (wav "snare-block") :name "snare vinyl" }])
 
 ;; State
 (def state (r/atom {:playing #{}})) 
@@ -76,37 +96,36 @@
               [key (when clip (js/Audio. clip))])
             codes)))
 
-(defn- play-pause
+(defn- play-clip
   [clip]
-  (let [playing? (not (.-paused clip))]
-    (if playing?
-      (do
-        (.pause clip)
-        (set! (.-currentTime clip) 0.0)
-        (rem-playing! clip))
-      (do
-        (.play clip)
-        (add-playing! clip)))))
+  (doto clip
+    (.pause)
+    (-> .-currentTime (set! 0.0))
+    (.play)
+    (add-playing!)))
 
-(defn play-pause-from-cache
+(defn play-clip-from-cache
   [key cache]
-  (play-pause (cache key)))
+  (if-let [clip (cache key)]
+    (play-clip clip)))
 
 ;; Components
 (defn letter-button
   "Renders a button displaying the key
   and playing an audio clip if clicked"
-  [{:keys [key clip]} audio]
-  (let [play-handler #(play-pause audio)
+  [{:keys [key clip name]} audio]
+  (let [play-handler #(play-clip audio)
         _ (when audio (set! (.-onended audio) #(rem-playing! audio)))]
-    (fn [_ _]
-      [:div {:class ["letter" (when @(r/track am-i-playing? audio) "playing")]
+    (fn []
+      [:div {:class ["letter"
+                     (when @(r/track am-i-playing? audio) "playing")]
              :on-click (when clip play-handler)} ;;TODO: set style when playing
-       key])))
+       [:span {:class "key"}(.toUpperCase key)]
+       [:span {:class "name"} name]])))
 
 (defn letters []
   (r/with-let [audio-clips (audio-cache key-codes)
-               key-handler #(play-pause-from-cache (.toUpperCase (.-key %)) audio-clips)
+               key-handler #(play-clip-from-cache (.-key %) audio-clips)
                _ (.addEventListener js/document "keypress" key-handler)]
     [:div {:class "letter-container"}
      (for [{:keys [key] :as key-code} key-codes]
