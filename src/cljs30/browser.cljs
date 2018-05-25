@@ -1,7 +1,7 @@
-(ns starter.browser
+(ns cljs30.browser
   (:require [reagent.core :as r]
-            [starter.utils :as utils]
-            [starter.drum-kit :as drum-kit]))
+            [cljs30.utils :as utils]
+            [cljs30.drum-kit :as drum-kit]))
 
 (def lesson-map {:drum-kit drum-kit/lesson})
 (def lessons [["drum-kit" :drum-kit]])

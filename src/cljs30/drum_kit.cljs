@@ -1,5 +1,5 @@
-(ns starter.drum-kit
-  (:require [starter.utils :refer [styled-component]]
+(ns cljs30.drum-kit
+  (:require [cljs30.utils :refer [styled-component]]
             [reagent.core :as r]))
 
 (defn random-color [] (-> (js/Math.random) (* 255) int))

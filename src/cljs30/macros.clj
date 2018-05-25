@@ -1,4 +1,4 @@
-(ns starter.macros)
+(ns cljs30.macros)
 
 (defmacro create-lesson [component]
   `(def ~'lesson (if style

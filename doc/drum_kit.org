@@ -1,0 +1,30 @@
+* Drum Kit Notes
+** Reagent                                                          :reagent:
+*** Tracking                                                          :state:
+**** Allows you to peek into a particular aspect of state and watch for changes
+     #+BEGIN_SRC clojurescript
+       (def state (r/atom {:playing #{}})) ;; Our state object
+       (defn playing [] (:playing @state)) ;; function that gets our playing state value
+       (defn playing? #(-> @(r/track playing) (get %))) ;; Will be called when @state changes
+
+       ;; component will re-render if only value returned has change
+       (defn component []
+         (let [playing? @(r/track playing?)]
+           [:div (str "playing?: playing")]))
+     #+END_SRC
+** Interop 
+*** Audio object                                              :interop:audio:
+     #+BEGIN_SRC clojurescript
+       (def audio (js/Audio. url)) ;;create  audio obj
+       (set! (.-currentTime audio) 0.0) ;; set time
+       (.-currentTime audio) ;; get time
+       (.-paused clip) ;; check if paused
+     #+END_SRC
+*** Converting cljs arrays to js arrays           :interop:arrays:conversion:
+ #+BEGIN_SRC clojurescript
+   (.join [1 2 3 4]) ;; Throws error, not a js array
+
+   (let [cljs-vec [1 2 3 4]
+         js-array (into-array cljs-vec)]
+     (.join js-aray)) ;; > "1,2,3,4"
+ #+END_SRC 
