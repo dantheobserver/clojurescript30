@@ -1,39 +1,25 @@
 (ns cljs30.browser
   (:require [reagent.core :as r]
             [cljs30.utils :as utils]
-            [cljs30.drum-kit :as drum-kit]))
+            [react :as react]
+            [goog.object :as obj]
+            [cljs30.drum-kit :as drum-kit]
+            [cljs30.css-clock :as css-clock]))
 
-(def lesson-map {:drum-kit drum-kit/lesson})
-(def lessons [["drum-kit" :drum-kit]])
+(def lessons
+  (sorted-map :drum-kit ["Drum Kit" drum-kit/lesson]
+              :css-clock ["Css Clock" css-clock/lesson]))
 
-(defn window-hash
-  "Gets the has-value from window-location"
-  []
-  (-> js/window .-location .-hash
-      (.split "/")
-      (get 1)))
-
-(def window-key (comp keyword window-hash))
-
-(defn mount-style!
-  [component]
-  (let [style (-> component meta :style)]
-    (when style (utils/mount-css style))))
-
-(defn set-lesson!
-  "Places `lesson-component` into the lesson container"
-  [lesson-component]
-  (r/render [lesson-component]
-            (js/document.getElementById "lesson")
-            #(mount-style! lesson-component)))
+(def window-key (-> (utils/location-hash)
+                    keyword))
 
 (defn lesson-links []
   [:ul
-   (for [[name lesson-key] lessons]
-     ^{:key name}
-     [:li [:a {:href (str "#/" name)
-                :on-click #(set-lesson! (lesson-key lesson-map))}
-            name]])])
+   (for [[lesson-key [title lesson]] lessons]
+     ^{:key lesson-key}
+     [:li [:a {:href (str "#/" (name lesson-key))
+               :on-click #(utils/set-lesson! lesson)}
+            lesson-key]])])
 
 (defn app-component []
   [:div
@@ -41,17 +27,21 @@
    [:br]
    [lesson-links]])
 
+
 ;; start is called by init and after code reloading finishes
 (defn ^:dev/after-load start []
-  (r/render [app-component]
-            (js/document.getElementById "app"))
-  (if-let [k (window-key)]
-    (set-lesson! (k lesson-map))))
+  (obj/set js/window "React" react)
+  (r/render [app-component] (js/document.querySelector "#app"))
+  (let [[_ lesson] (get lessons window-key)] 
+    (utils/set-lesson! lesson)
+    #_(r/render [lesson] (js/document.querySelector "#lesson")))
+  #_(render-app))
 
 (defn ^:export init []
   ;; init is called ONCE when the page loads
   ;; this is called in the index.html and must be exported
   ;; so it is available even in :advanced release builds
+  ;; (devtools.core/install! [:formatters :hints])
   (js/console.log "init")
   (start))
 

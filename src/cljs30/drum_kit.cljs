@@ -10,7 +10,6 @@
   (let [rgba (into-array (conj (random-rgb) a))]
     (str "rgba(" (.join rgba) ")")))
 
-(js/console.log "test: " (random-rgb-style 1))
 (def style
   [:#lesson
    {:width "100%" :height "900px";
