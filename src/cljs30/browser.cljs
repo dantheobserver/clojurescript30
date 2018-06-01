@@ -4,7 +4,8 @@
             [react :as react]
             [goog.object :as obj]
             [cljs30.drum-kit :as drum-kit]
-            [cljs30.css-clock :as css-clock]))
+            [cljs30.css-clock.core :as css-clock]
+            [cljss.core :as css]))
 
 (def lessons
   (sorted-map :drum-kit ["Drum Kit" drum-kit/lesson]
@@ -30,12 +31,11 @@
 
 ;; start is called by init and after code reloading finishes
 (defn ^:dev/after-load start []
+  (css/remove-styles!)
   (obj/set js/window "React" react)
   (r/render [app-component] (js/document.querySelector "#app"))
   (let [[_ lesson] (get lessons window-key)] 
-    (utils/set-lesson! lesson)
-    #_(r/render [lesson] (js/document.querySelector "#lesson")))
-  #_(render-app))
+    (utils/set-lesson! lesson)))
 
 (defn ^:export init []
   ;; init is called ONCE when the page loads

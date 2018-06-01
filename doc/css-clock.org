@@ -1,2 +1,24 @@
 * CSS-Clock
-** using 
+** using cljss styled components. 
+   #+BEGIN_SRC clojurescript
+     ;; Higher order function that returns a React component creator
+     (defn styled-component [tag styles]
+       {:style/indent 1}
+       (fn [attrs & content]
+         [tag (merge-with str attrs {:class (apply with-styles styles)})
+          (for [c content] c)]))
+
+     ;; component created To be used in react as normal
+     ;; Can even skip this step as react can treat it as a level-2 component.
+     (def clock-face (styles/styled-component :div [styles/all-centered styles/face]))
+
+     ;; Use like a normal component this solution requires attrs to be specified
+     ;; styled-component can be modified to work around this.
+     (fn [] 
+       [:div
+        [clock-container {}
+         [clock-face {}
+          [hour-hand {}]
+          [minute-hand {}]
+          [second-hand {}]]]])
+   #+END_SRC
