@@ -43,18 +43,32 @@
                :minutes minutes
                :seconds seconds))))
 
+(defn- rotation-style [amt]
+  {:style {:transform
+           (str "rotateZ(" (+ 180 amt) "deg)")}})
+
+(defn- hr-rot [hr] ;;add minute modifier
+  (rotation-style (* 30 hr)))
+
+(defn- min-rot [min]  ;;add second modifier
+  (rotation-style (* 6 min)))
+
+(defn- sec-rot [sec]
+  (rotation-style (* 6 sec)))
+
+;; TODO: Add large and small time ticks/numbers
 (defn lesson []
   (let [time (r/atom {:hours 0 :minutes 0 :seconds 0}) 
-        hour-cursor (r/cursor time [:hours])
-        minute-cursor (r/cursor time [:minutes])
-        second-cursor (r/cursor time [:seconds])
+        hour-c (r/cursor time [:hours])
+        minute-c (r/cursor time [:minutes])
+        second-c (r/cursor time [:seconds])
         _ (set-time! time)
         _ (js/setInterval #(set-time! time) 1000)]
     (fn [] 
       [:div
        [clock-container {}
         [clock-face {}
-         [hour-hand {}]
-         [minute-hand {}]
-         [second-hand {}]]
-        [digital-clock @hour-cursor @minute-cursor @second-cursor]]])))
+         [hour-hand (hr-rot @hour-c)]
+         [minute-hand (min-rot @minute-c)]
+         [second-hand (sec-rot @second-c)]]
+        [digital-clock @hour-c @minute-c @second-c]]])))
