@@ -41,6 +41,7 @@
    :top "50%" :left "50%"
    :transform-origin "top"
    :transform "rotateZ(180deg)"
+   :transition "transform .5s ease-out"
    })
 
 (defstyles digi-clock-container []

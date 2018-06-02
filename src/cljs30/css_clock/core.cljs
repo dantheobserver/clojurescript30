@@ -39,13 +39,13 @@
   (let [[hours minutes seconds] (get-time-parts (js/Date.))]
     (-> atom
         (swap! assoc
-               :hours hours
+               :hours (mod hours 12)
                :minutes minutes
                :seconds seconds))))
 
 (defn- rotation-style [amt]
   {:style {:transform
-           (str "rotateZ(" (+ 180 amt) "deg)")}})
+           (str "rotateZ(" (mod (+ 180 amt) 360 ) "deg)")}})
 
 (defn- hr-rot [hr] ;;add minute modifier
   (rotation-style (* 30 hr)))
@@ -57,6 +57,7 @@
   (rotation-style (* 6 sec)))
 
 ;; TODO: Add large and small time ticks/numbers
+;; TODO: Add sounds for each hand 
 (defn lesson []
   (let [time (r/atom {:hours 0 :minutes 0 :seconds 0}) 
         hour-c (r/cursor time [:hours])
