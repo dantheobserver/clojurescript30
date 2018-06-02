@@ -1,17 +1,25 @@
 (ns cljs30.css-clock.core
   (:require [reagent.core :as r]
-            [cljs30.css-clock.styles :as styles]
+            [cljs30.css-clock.styles :as s]
             [cljs30.utils :as utils]))
 
-;; Components
-(def clock-container (styles/styled-component :div [styles/clock-container]))
-(def clock-face (styles/styled-component :div [styles/all-centered styles/face]))
-(def hour-hand (styles/styled-component :div [#(styles/hand ".4rem" "30%")])) ;; call function returned by defstyles with arguments to et style.
-(def minute-hand (styles/styled-component :div [#(styles/hand ".2rem" "40%")]))
-(def second-hand (styles/styled-component :div [#(styles/hand ".1rem" "45%")]))
+;; clock-components
+(def rems #(str % "rem"))
+(def clock-size 30)
+
+(def clock-container (s/styled-component :div [s/clock-container]))
+(def clock-face (s/styled-component :div [s/all-centered #(s/face (rems clock-size))]))
+(def hour-hand (s/styled-component :div [#(s/hand ".4rem" "30%")]))
+(def minute-hand (s/styled-component :div [#(s/hand ".2rem" "40%")]))
+(def second-hand (s/styled-component :div [#(s/hand ".1rem" "45%")]))
+
+(def clock-tick-container
+  (s/styled-component :div [s/all-centered #(s/tick-container (rems clock-size))]))
+(def small-tick (s/styled-component :div [s/all-centered #(s/clock-tick ".1rem" "blue")]))
+(def large-tick (s/styled-component :div [s/all-centered #(s/clock-tick ".5rem" "black")]))
 
 ;; Digital Clock
-(def digi-clock-container (styles/styled-component :div [styles/all-centered styles/digi-clock-container]))
+(def digi-clock-container (s/styled-component :div [s/all-centered s/digi-clock-container]))
 
 (defn- part-str [part]
   (str (when (< part 10) 0)
@@ -45,7 +53,7 @@
 
 (defn- rotation-style [amt]
   {:style {:transform
-           (str "rotateZ(" (mod (+ 180 amt) 360 ) "deg)")}})
+           (str "rotateZ(" (mod (+ 180 amt) 720) "deg)")}})
 
 (defn- hr-rot [hr] ;;add minute modifier
   (rotation-style (* 30 hr)))
@@ -65,11 +73,19 @@
         second-c (r/cursor time [:seconds])
         _ (set-time! time)
         _ (js/setInterval #(set-time! time) 1000)]
-    (fn [] 
+    (fn []
       [:div
        [clock-container {}
         [clock-face {}
          [hour-hand (hr-rot @hour-c)]
          [minute-hand (min-rot @minute-c)]
          [second-hand (sec-rot @second-c)]]
-        [digital-clock @hour-c @minute-c @second-c]]])))
+        [digital-clock @hour-c @minute-c @second-c]
+        [clock-tick-container {}
+         (for [i (range 1 61)
+               :let [style (str "rotateZ(" (+ 180 (* i 6)) "deg) "
+                                " translate(0, 17.2rem)")]] ;; tick per 6 deg
+           (if (= 0 (mod i 5))
+             ^{:key (str "tick" i)}[large-tick {:style {:transform style}}]
+             ^{:key (str "tick" i)}[small-tick {:style {:transform style}}]))]
+        ]])))

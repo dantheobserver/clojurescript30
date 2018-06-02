@@ -23,28 +23,37 @@
    :background-image "linear-gradient(white 10%, lightblue)"
    :height "90rem"})
 
-(defstyles face []
+(defstyles face [size]
   {:border "3rem solid rgba(0, 0, 0, 0)"
    :border-radius "50%"
-   :width "30rem"
-   :height "30rem"
+   :width size
+   :height size
    :font-size "2rem"
-   :box-shadow "0px 0px 20px 7px black"
-   })
+   :box-shadow "0px 0px 20px 7px black"})
 
 (defstyles hand [width length]
   {:background-color "black"
    :width width
    :height length
-   :line-height (str "calc(" length " * 30)")
    :position "absolute"
    :top "50%" :left "50%"
    :transform-origin "top"
-   :transform "rotateZ(180deg)"
-   :transition "transform .5s ease-out"
-   })
+   :transform "rotateZ(180deg)"})
 
 (defstyles digi-clock-container []
   {:margin "0 auto"
    :font-family "courier new"
    :font-size "3rem"})
+
+(defstyles tick-container [size]
+  {;;:clip-path "circle(3% at 50% 50%)"
+   :width size
+   :height size})
+
+(defstyles clock-tick [width, color]
+  {:width width
+   :height "1.1rem"
+   :background-color color
+   :opacity ".7"
+   :transform-origin "top"
+   })
