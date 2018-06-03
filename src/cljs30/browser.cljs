@@ -8,8 +8,8 @@
             [cljss.core :as css]))
 
 (def lessons
-  (sorted-map :drum-kit ["Drum Kit" drum-kit/lesson]
-              :css-clock ["Css Clock" css-clock/lesson]))
+  (sorted-map :01-drum-kit ["Drum Kit" drum-kit/lesson]
+              :02-css-clock ["Css Clock" css-clock/lesson]))
 
 (def window-key (-> (utils/location-hash)
                     keyword))

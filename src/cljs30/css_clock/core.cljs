@@ -52,8 +52,8 @@
                :seconds seconds))))
 
 (defn- rotation-style [amt]
-  {:style {:transform
-           (str "rotateZ(" (mod (+ 180 amt) 720) "deg)")}})
+  {:style (merge {:transform (str "rotateZ(" (mod (+ 180 amt) 540) "deg)")}
+                 (when (= 534 amt) {:transition "none"}))})
 
 (defn- hr-rot [hr] ;;add minute modifier
   (rotation-style (* 30 hr)))
@@ -64,6 +64,15 @@
 (defn- sec-rot [sec]
   (rotation-style (* 6 sec)))
 
+(defn ticks []
+  [clock-tick-container {}
+   (for [i (range 1 61)
+         :let [transform (str "rotateZ(" (+ 180 (* i 6)) "deg) "
+                              " translate(0, 17.2rem)")
+               tick-component (if (= 0 (mod i 5)) large-tick small-tick)
+               style {:style {:transform transform}}]]
+     ^{:key (str "tick" i)}[tick-component (with-meta style :style)])])
+
 ;; TODO: Add large and small time ticks/numbers
 ;; TODO: Add sounds for each hand 
 (defn lesson []
@@ -72,20 +81,14 @@
         minute-c (r/cursor time [:minutes])
         second-c (r/cursor time [:seconds])
         _ (set-time! time)
-        _ (js/setInterval #(set-time! time) 1000)]
+        _ (js/setInterval #(set-time! time) 1000)
+        ]
     (fn []
       [:div
        [clock-container {}
-        [clock-face {}
-         [hour-hand (hr-rot @hour-c)]
-         [minute-hand (min-rot @minute-c)]
-         [second-hand (sec-rot @second-c)]]
+        ^{:key :x}[clock-face {}
+         ^{:key :a}[hour-hand (hr-rot @hour-c)]
+         ^{:key :b}[minute-hand (min-rot @minute-c)]
+         ^{:key :c}[second-hand (sec-rot @second-c)]]
         [digital-clock @hour-c @minute-c @second-c]
-        [clock-tick-container {}
-         (for [i (range 1 61)
-               :let [style (str "rotateZ(" (+ 180 (* i 6)) "deg) "
-                                " translate(0, 17.2rem)")]] ;; tick per 6 deg
-           (if (= 0 (mod i 5))
-             ^{:key (str "tick" i)}[large-tick {:style {:transform style}}]
-             ^{:key (str "tick" i)}[small-tick {:style {:transform style}}]))]
-        ]])))
+        #_[ticks]]])))

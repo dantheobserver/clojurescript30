@@ -1,5 +1,6 @@
 (ns cljs30.css-clock.styles
-  (:require [cljss.core :as css :refer-macros [defstyles]]))
+  (:require [cljss.core :as css :refer-macros [defstyles]]
+            ["uuid" :as js-uuid]))
 
 (defn- with-styles [& styles]
   (str " " (clojure.string/join " " (for [s styles] (s)))))
@@ -9,7 +10,7 @@
   {:style/indent 1}
   (fn [attrs & content]
     [tag (merge-with str attrs {:class (apply with-styles styles)})
-     (for [c content] c)]))
+     (for [c content] (with-meta c {:key (js-uuid)}))]))
 
 ;; Analog Clock
 (defstyles all-centered []
@@ -38,7 +39,9 @@
    :position "absolute"
    :top "50%" :left "50%"
    :transform-origin "top"
-   :transform "rotateZ(180deg)"})
+   :transform "rotateZ(180deg)"
+   :transition "all 0.05s"
+   :transition-timing-function "cubic-bezier(0.1, 2.7, 0.58, 1)"})
 
 (defstyles digi-clock-container []
   {:margin "0 auto"
