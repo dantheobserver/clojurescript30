@@ -29,3 +29,14 @@
 #+BEGIN_SRC clojurescript
   (:require ["uuid" :as js-uuid]))
 #+END_SRC
+** Rendering a list that doesn't change
+*** use into a vector if your list
+    [[https://stackoverflow.com/questions/37164091/how-do-i-loop-through-a-subscribed-collection-in-re-frame-and-display-the-data-a/37186230#37186230][Stackoverflow Explination]]
+#+BEGIN_SRC clojurescript
+  ;; instead of 
+  [sometag
+   (for [c in set-child-components] c)]
+
+  ;; do
+  (into [sometag set-child-components])
+#+END_SRC

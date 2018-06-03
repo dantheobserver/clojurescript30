@@ -1,16 +1,21 @@
 (ns cljs30.css-clock.styles
   (:require [cljss.core :as css :refer-macros [defstyles]]
-            ["uuid" :as js-uuid]))
+            [cljs30.utils :as utils]))
 
 (defn- with-styles [& styles]
   (str " " (clojure.string/join " " (for [s styles] (s)))))
 
 ;; TODO: arguments should just be & content and do a type check for first arg being a map of attrs, more versatile when not passing in any arguments
+;; (defn styled-component [tag styles]
+;;   {:style/indent 1}
+;;   (fn [attrs & content]
+;;     [tag (merge-with str attrs {:class (apply with-styles styles)})
+;;      (for [c content] c)]))
 (defn styled-component [tag styles]
   {:style/indent 1}
   (fn [attrs & content]
-    [tag (merge-with str attrs {:class (apply with-styles styles)})
-     (for [c content] (with-meta c {:key (js-uuid)}))]))
+    (into [tag (merge-with str attrs {:class (apply with-styles styles)})]
+          content)))
 
 ;; Analog Clock
 (defstyles all-centered []
