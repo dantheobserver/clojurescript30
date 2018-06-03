@@ -1,24 +1,4 @@
-* CSS-Clock
-** using cljss styled components.                                       :css:
-    #+BEGIN_SRC clojurescript
-      ;; Higher order function that returns a React component creator
-      (defn styled-component [tag styles]
-        {:style/indent 1}
-        (fn [attrs & content]
-          [tag (merge-with str attrs {:class (apply with-styles styles)})
-           (for [c content] c)]))
-
-      ;; Creating a style with and without arguments
-      (defstyles digi-clock-container []
-        {:margin "0 auto"
-         :font-family "courier new"
-         :font-size "3rem"})
-
-      (defstyles clock-tick [width, color]
-        {:width width
-         :height ".3rem"
-         :background-color color
-         :opacity ".5"
+* CSS-   :opacity ".5"
          :transform-origin "bottom" })
 
       ;; To call a styled component that takes no arguments
@@ -44,3 +24,8 @@
     #+BEGIN_SRC clojurescript
 
     #+END_SRC
+** Using npm packages
+*** yarn install package and use via require
+#+BEGIN_SRC clojurescript
+  (:require ["uuid" :as js-uuid]))
+#+END_SRC

@@ -81,14 +81,13 @@
         minute-c (r/cursor time [:minutes])
         second-c (r/cursor time [:seconds])
         _ (set-time! time)
-        _ (js/setInterval #(set-time! time) 1000)
-        ]
+        _ (js/setInterval #(set-time! time) 1000)]
     (fn []
       [:div
        [clock-container {}
-        ^{:key :x}[clock-face {}
-         ^{:key :a}[hour-hand (hr-rot @hour-c)]
-         ^{:key :b}[minute-hand (min-rot @minute-c)]
-         ^{:key :c}[second-hand (sec-rot @second-c)]]
+        [clock-face {}
+         [hour-hand (hr-rot @hour-c)]
+         [minute-hand (min-rot @minute-c)]
+         [second-hand (sec-rot @second-c)]]
         [digital-clock @hour-c @minute-c @second-c]
         #_[ticks]]])))
