@@ -36,10 +36,8 @@
   (r/render [lesson-component]
             (js/document.getElementById "lesson")
             #(mount-style! lesson-component)))
-;; Routing
-(defn location-hash
+
+(defn current-path
   "Gets the has-value from window-location"
   []
-  (-> js/window .-location .-hash
-      (.split "/")
-      (get 1)))
+  (-> js/window .-location .-hash (subs 1)))

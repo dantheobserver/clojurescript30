@@ -1,26 +1,22 @@
 (ns cljs30.browser
-  (:require [reagent.core :as r]
-            [cljs30.utils :as utils]
+  (:require [cljs30.utils :as utils]
+            [cljs30.routes :as routes]
+            [reagent.core :as r]
+            [cljss.core :as css]
             [react :as react]
-            [goog.object :as obj]
-            [cljs30.drum-kit :as drum-kit]
-            [cljs30.css-clock.core :as css-clock]
-            [cljss.core :as css]))
+            [goog.object :as obj]))
 
-(def lessons
-  (sorted-map :01-drum-kit ["Drum Kit" drum-kit/lesson]
-              :02-css-clock ["Css Clock" css-clock/lesson]))
-
-(def window-key (-> (utils/location-hash)
-                    keyword))
+(def lessons (map (fn [[route {:keys [name component]}]]
+                    [route name component])
+                  (.-routes routes/router)))
 
 (defn lesson-links []
   [:ul
-   (for [[lesson-key [title lesson]] lessons]
-     ^{:key lesson-key}
-     [:li [:a {:href (str "#/" (name lesson-key))
+   (for [[route name lesson] lessons]
+     ^{:key name}
+     [:li [:a {:href (str "#" route)
                :on-click #(utils/set-lesson! lesson)}
-            lesson-key]])])
+            name]])])
 
 (defn app-component []
   [:div
@@ -28,14 +24,13 @@
    [:br]
    [lesson-links]])
 
-
 ;; start is called by init and after code reloading finishes
 (defn ^:dev/after-load start []
   (css/remove-styles!)
   (obj/set js/window "React" react)
   (r/render [app-component] (js/document.querySelector "#app"))
-  (let [[_ lesson] (get lessons window-key)] 
-    (utils/set-lesson! lesson)))
+  (when-let [{:keys [component]} (-> (utils/current-path) routes/route-data)] 
+    (utils/set-lesson! component)))
 
 (defn ^:export init []
   ;; init is called ONCE when the page loads

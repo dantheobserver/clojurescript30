@@ -5,17 +5,13 @@
 (defn- with-styles [& styles]
   (str " " (clojure.string/join " " (for [s styles] (s)))))
 
-;; TODO: arguments should just be & content and do a type check for first arg being a map of attrs, more versatile when not passing in any arguments
-;; (defn styled-component [tag styles]
-;;   {:style/indent 1}
-;;   (fn [attrs & content]
-;;     [tag (merge-with str attrs {:class (apply with-styles styles)})
-;;      (for [c content] c)]))
 (defn styled-component [tag styles]
   {:style/indent 1}
-  (fn [attrs & content]
-    (into [tag (merge-with str attrs {:class (apply with-styles styles)})]
-          content)))
+  (fn [cmp-attr & content]
+    (let [class {:class (apply with-styles styles)}]
+      (if (map? cmp-attr)
+        (into [tag (merge-with str cmp-attr class)] content)
+        (into [tag class] (conj content cmp-attr))))))
 
 ;; Analog Clock
 (defstyles all-centered []

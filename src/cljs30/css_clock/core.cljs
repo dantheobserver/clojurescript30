@@ -25,14 +25,11 @@
   (str (when (< part 10) 0)
        part))
 
-(defn clock-part [part]
-  [:span (part-str part)])
-
-(defn digi-clock-sep [sep]
-  [:span sep])
+(defn clock-part [part] [:span (part-str part)])
+(defn digi-clock-sep [sep] [:span sep])
 
 (defn digital-clock [hr min sec]
-  [digi-clock-container {}
+  [digi-clock-container
    [clock-part hr]
    [digi-clock-sep ":"]
    [clock-part min]
@@ -65,29 +62,29 @@
   (rotation-style (* 6 sec)))
 
 (defn ticks []
-  [clock-tick-container {}
+  [clock-tick-container
    (for [i (range 1 61)
          :let [transform (str "rotateZ(" (+ 180 (* i 6)) "deg) "
                               " translate(0, 17.2rem)")
                tick-component (if (= 0 (mod i 5)) large-tick small-tick)
-               style {:style {:transform transform}}]]
-     ^{:key (str "tick" i)}[tick-component (with-meta style :style)])])
+               style {:style {:tansform transform}}]]
+     ^{:key i}[tick-component (with-meta style :style)])])
 
-;; TODO: Add large and small time ticks/numbers
 ;; TODO: Add sounds for each hand 
 (defn lesson []
   (let [time (r/atom {:hours 0 :minutes 0 :seconds 0}) 
         hour-c (r/cursor time [:hours])
         minute-c (r/cursor time [:minutes])
-        second-c (r/cursor time [:seconds])
-        _ (set-time! time)
-        _ (js/setInterval #(set-time! time) 1000)]
+        second-c (r/cursor time [:seconds])]
+    (set-time! time)
+    (js/setInterval #(set-time! time) 1000)
     (fn []
-      [:div
-       [clock-container {}
-        [clock-face {}
-         [hour-hand (hr-rot @hour-c)]
-         [minute-hand (min-rot @minute-c)]
-         [second-hand (sec-rot @second-c)]]
-        [digital-clock @hour-c @minute-c @second-c]
-        #_[ticks]]])))
+     [:div
+      [ticks]
+      [clock-container
+       [clock-face
+        [hour-hand (hr-rot @hour-c)]
+        [minute-hand (min-rot @minute-c)]
+        [second-hand (sec-rot @second-c)]]
+       [digital-clock @hour-c @minute-c @second-c]
+       ]])))
