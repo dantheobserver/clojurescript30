@@ -6,6 +6,10 @@ body {
     font-size: 1.2em;
 }
 
+html,body {
+    height: 100%;
+}
+
 .app-container {
     display: flex;
     height: 100%;
@@ -13,5 +17,14 @@ body {
 }
 
 .lesson-container {
+    position: relative;
     flex-grow: 2;
+}
+
+#lesson {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
 }
